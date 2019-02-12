@@ -50,6 +50,7 @@
       </Form>
     </div>
     <div class="content">
+      <!-- 数据表格 -->
       <Table
         stripe
         border
@@ -59,6 +60,7 @@
       ></Table>
       <div class="content-page" style="margin-top: 10px">
         <Row type="flex" justify="end">
+          <!-- 分页 -->
           <Page
             :total="pageInfo.total"
             :current="pageInfo.startPage"
@@ -71,6 +73,7 @@
         </Row>
       </div>
     </div>
+    <!-- 抽屉展示详细数据 -->
     <Drawer
       width="400"
       :style="chargeDrawerStyle"
@@ -85,16 +88,16 @@
           <Cell title="应用Id" :extra="String(selectedCharge.appId)"/>
           <Cell title="商品标题" :extra="selectedCharge.subject"/>
           <Cell title="支付单金额" :extra="String(selectedCharge.amount)"/>
-          <Cell title="实付金额" :extra="selectedCharge.actualAmount || '*'"/>
+          <Cell title="实付金额" :extra="selectedCharge.actualAmount || 'N/A'"/>
           <Cell title="状态" :extra="selectedCharge.status"/>
           <Cell title="支付渠道" :extra="selectedCharge.channel"/>
-          <Cell title="渠道交易号" :extra="selectedCharge.platformTradeNo || '*'"/>
+          <Cell title="渠道交易号" :extra="selectedCharge.platformTradeNo || 'N/A'"/>
           <Cell title="客户端IP" :extra="selectedCharge.clientIp"/>
           <Cell title="过期时间" :extra="String(selectedCharge.timeExpire)"/>
           <Cell title="币种" :extra="selectedCharge.currency"/>
           <Cell title="描述" :extra="selectedCharge.body"/>
           <Cell title="创建时间" :extra="selectedCharge.timeCreated"/>
-          <Cell title="支付完成时间" :extra="selectedCharge.timePaid || '*'"/>
+          <Cell title="支付完成时间" :extra="selectedCharge.timePaid || 'N/A'"/>
 
           <Card :bordered="false" :dis-hover="true" :padding="0" v-if="selectedCharge.refundList">
             <p slot="title">退款单</p>
@@ -287,6 +290,7 @@ export default {
   },
   mounted() {
     // 每次挂载组件时都进行数据请求
+    // TODO 首次获取一周的数据，避免后台数据量过大
     this.getChargeList();
   }
 };
