@@ -120,6 +120,23 @@ export default [
     ]
   },
   {
+    path: '/app/:appId/log',
+    name: 'Log',
+    component: Main,
+    children: [
+      {
+        path: 'record',
+        name: 'LogRecord',
+        meta: {
+          icon: 'md-funnel',
+          title: '日志查看',
+          notCache: true
+        },
+        component: () => import('@/view/log-record/log-record.vue')
+      }
+    ]
+  },
+  {
     path: '/401',
     name: 'error_401',
     meta: {
