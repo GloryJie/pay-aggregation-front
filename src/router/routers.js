@@ -67,7 +67,7 @@ export default [
         path: 'charge',
         name: 'ChargeManage',
         meta: {
-          icon: 'md-funnel',
+          icon: 'logo-usd',
           title: '支付管理',
           notCache: true
         },
@@ -77,7 +77,7 @@ export default [
         path: 'refund',
         name: 'RefundManage',
         meta: {
-          icon: 'md-funnel',
+          icon: 'logo-usd',
           title: '退款单管理',
           notCache: true
         },
@@ -94,7 +94,7 @@ export default [
         path: 'config',
         name: 'ChannelConfig',
         meta: {
-          icon: 'md-funnel',
+          icon: 'md-cog',
           title: '渠道配置',
           notCache: true
         },
@@ -111,7 +111,7 @@ export default [
         path: 'config',
         name: 'NotifyConfig',
         meta: {
-          icon: 'md-funnel',
+          icon: 'md-construct',
           title: '通知配置',
           notCache: true
         },
@@ -128,7 +128,7 @@ export default [
         path: 'record',
         name: 'LogRecord',
         meta: {
-          icon: 'md-funnel',
+          icon: 'md-clipboard',
           title: '日志查看',
           notCache: true
         },

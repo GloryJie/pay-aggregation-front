@@ -109,3 +109,20 @@ export const deleteEventSubscriptionRequest = (appId,eventType) => {
     })
 }
 
+export const getAppMasterListRequest = (appId) => {
+    const url = '/app/master'
+    return axios.request({
+        url,
+        method: 'get'
+    })
+}
+
+export const addNewAppRequest = (param) => {
+    const url = '/app'
+    return axios.request({
+        url,
+        method: 'post',
+        data: param
+    })
+}
+

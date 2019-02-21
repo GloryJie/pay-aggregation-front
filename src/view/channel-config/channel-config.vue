@@ -413,7 +413,7 @@ export default {
               channelObject.startDate = "";
               channelObject.stopDate = "";
               channelObject.isOpened = false;
-              channelObject.self.$Notice.success({
+              self.$Notice.success({
                 title: "删除配置成功"
               });
             })
