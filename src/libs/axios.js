@@ -51,7 +51,9 @@ class HttpRequest {
       return { data, status }
     }, error => {
       this.destroy(url)
-      addErrorLog(error.response)
+      // 取消错误日志记录
+      // addErrorLog(error.response)
+      // TODO 统一错误通知notify
       return Promise.reject(error)
     })
   }
