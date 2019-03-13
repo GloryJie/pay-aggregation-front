@@ -16,6 +16,10 @@ export default {
     dev: '',
     pro: 'https://produce.com'
   },
+  basicAuth:{
+    username: 'vue-app',
+    password: 'abc'
+  },
   /**
    * @description 默认打开的首页的路由name值，默认为home, 跳转到应用列表页
    */

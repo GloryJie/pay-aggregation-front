@@ -88,12 +88,12 @@
           <Cell title="应用Id" :extra="String(selectedCharge.appId)"/>
           <Cell title="商品标题" :extra="selectedCharge.subject"/>
           <Cell title="支付单金额" :extra="String(selectedCharge.amount)"/>
-          <Cell title="实付金额" :extra="selectedCharge.actualAmount || 'N/A'"/>
+          <Cell title="实付金额" :extra="String(selectedCharge.actualAmount || 'N/A')"/>
           <Cell title="状态" :extra="selectedCharge.status"/>
           <Cell title="支付渠道" :extra="selectedCharge.channel"/>
           <Cell title="渠道交易号" :extra="selectedCharge.platformTradeNo || 'N/A'"/>
           <Cell title="客户端IP" :extra="selectedCharge.clientIp"/>
-          <Cell title="过期时间" :extra="String(selectedCharge.timeExpire)"/>
+          <Cell title="过期时间" :extra="String(selectedCharge.timeExpire) + 'm'"/>
           <Cell title="币种" :extra="selectedCharge.currency"/>
           <Cell title="描述" :extra="selectedCharge.body"/>
           <Cell title="创建时间" :extra="selectedCharge.timeCreated"/>

@@ -1,6 +1,9 @@
 import axios from 'axios'
 import store from '@/store'
+import { Notice } from 'iview'
+
 // import { Spin } from 'iview'
+
 const addErrorLog = errorInfo => {
   const { statusText, status, request: { responseURL } } = errorInfo
   let info = {
@@ -13,11 +16,11 @@ const addErrorLog = errorInfo => {
 }
 
 class HttpRequest {
-  constructor (baseUrl = baseURL) {
+  constructor(baseUrl = baseURL) {
     this.baseUrl = baseUrl
     this.queue = {}
   }
-  getInsideConfig () {
+  getInsideConfig() {
     const config = {
       baseURL: this.baseUrl,
       headers: {
@@ -26,15 +29,18 @@ class HttpRequest {
     }
     return config
   }
-  destroy (url) {
+  destroy(url) {
     delete this.queue[url]
     if (!Object.keys(this.queue).length) {
       // Spin.hide()
     }
   }
-  interceptors (instance, url) {
+  interceptors(instance, url) {
     // 请求拦截
     instance.interceptors.request.use(config => {
+      if (!config.url.includes('token') || !config.url.includes('logout')) {
+        config.headers['Authorization'] = 'Bearer' + store.state.user.token;
+      }
       // 添加全局的loading...
       if (!Object.keys(this.queue).length) {
         // Spin.show() // 不建议开启，因为界面不友好
@@ -47,17 +53,21 @@ class HttpRequest {
     // 响应拦截
     instance.interceptors.response.use(res => {
       this.destroy(url)
-      const { data, status } = res
+      const { status } = res
+      let data = res.data.data == undefined ? res.data : res.data.data;
       return { data, status }
     }, error => {
       this.destroy(url)
-      // 取消错误日志记录
+      let errorMsg = error.response.data.message;
       // addErrorLog(error.response)
-      // TODO 统一错误通知notify
+      // 统一错误通知notify
+      Notice.error({
+        title: errorMsg
+      })
       return Promise.reject(error)
     })
   }
-  request (options) {
+  request(options) {
     const instance = axios.create()
     options = Object.assign(this.getInsideConfig(), options)
     this.interceptors(instance, options.url)

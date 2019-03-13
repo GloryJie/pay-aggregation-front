@@ -1,20 +1,32 @@
 import axios from '@/libs/api.request'
+import config from '@/config'
+const { basicAuth } = config
 
 export const login = ({ userName, password }) => {
   const data = {
-    userName,
-    password
+    username: userName,
+    password,
+    grant_type: 'password',
+    scope: 'all'
+  }
+  let formData = new URLSearchParams();
+  for(let key in data){
+    formData.append(key,data[key])
   }
   return axios.request({
-    url: 'login',
-    data,
-    method: 'post'
+    url: '/auth/oauth/token',
+    data: formData,
+    method: 'post',
+    auth: basicAuth,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
   })
 }
 
 export const getUserInfo = (token) => {
   return axios.request({
-    url: '/get_info',
+    url: '/auth/web/user/info',
     params: {
       token
     },
