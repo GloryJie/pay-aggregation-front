@@ -34,7 +34,11 @@
             </Col>
 
             <Col span="6">
-              <Card class="add-app-card" @click.native="showAddAppDrawer = true" style="margin-top: 18px">
+              <Card
+                class="add-app-card"
+                @click.native="showAddAppDrawer = true"
+                style="margin-top: 18px"
+              >
                 <Icon type="ios-add-circle" class="icon"/>
               </Card>
             </Col>
@@ -118,18 +122,23 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["setSelectedAppId"]),
+    ...mapMutations(["setSelectedAppId", "setSelectedApp"]),
     handleSelectedApp(appId) {
-      this.setSelectedAppId(appId);
+      this.handleSelected(appId);
       this.$router.push({ name: "AppHome", params: { appId } });
     },
     handleTradeOperation(appId) {
-      this.setSelectedAppId(appId);
+      this.handleSelected(appId);
       this.$router.push({ name: "ChargeManage", params: { appId } });
     },
     handleChannelConfigOperation(appId) {
-      this.setSelectedAppId(appId);
+      this.handleSelected(appId);
       this.$router.push({ name: "ChannelConfig", params: { appId } });
+    },
+    handleSelected(appId) {
+      this.setSelectedAppId(appId);
+      let app = this.appList.find(item => item.appId === appId);
+      this.setSelectedApp(app);
     },
     getAppMasterList() {
       getAppMasterListRequest()
@@ -148,9 +157,9 @@ export default {
               this.appList.push(data);
               this.showAddAppDrawer = false;
               this.$Notice.success({
-                title: '创建应用成功',
-                desc: '请前往应用主页进行相应配置'
-              })
+                title: "创建应用成功",
+                desc: "请前往应用主页进行相应配置"
+              });
             })
             .catch(res => {});
         }

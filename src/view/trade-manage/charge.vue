@@ -188,36 +188,7 @@ export default {
           key: "timeCreated"
         }
       ],
-      chargeList: [
-        {
-          chargeNo: "543505749247000576",
-          orderNo: "1549623468",
-          appId: 123456,
-          serviceAppId: 123456,
-          amount: 1,
-          status: "WAIT_PAY",
-          subject: "测试1223",
-          body: "描述信息",
-          channel: "ALIPAY_PAGE",
-          clientIp: "127.0.0.1",
-          description: "测试",
-          timeExpire: 2,
-          liveMode: true,
-          currency: "cny",
-          extra: {
-            returnUrl: "http://www.baidu.com"
-          },
-          timeCreated: "2019-02-08T18:57:48",
-          refundList: [
-            {
-              refundNo: "12379812738912",
-              channel: "ALIPAY_PAGE",
-              status: "SUCCESS",
-              amount: 1
-            }
-          ]
-        }
-      ]
+      chargeList: []
     };
   },
   methods: {
@@ -232,6 +203,9 @@ export default {
         item.status = transformChargeStatus(item.status);
         item.channel = transformChannel(item.channel);
         item.amount = parseFloat(item.amount / 100).toFixed(2);
+        if(item.actualAmount){
+          item.actualAmount = parseFloat(item.actualAmount / 100).toFixed(2);
+        }
         if (item.refundList) {
           item.refundList.forEach(refund => {
             refund.channel = transformChannel(refund.channel);

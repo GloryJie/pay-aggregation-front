@@ -145,6 +145,18 @@ export const getAppMasterListRequest = () => {
 }
 
 /**
+ * 获取指定应用信息
+ * @param {} appId 
+ */
+export const getAppInfoRequest = (appId) => {
+    const url = `/auth/web/app/${appId}/info`
+    return axios.request({
+        url,
+        method: 'get'
+    })
+}
+
+/**
  * 添加新的平台应用
  * @param {*} param 
  */
@@ -157,3 +169,16 @@ export const addNewAppRequest = (param) => {
     })
 }
 
+/**
+ * 更新应用信息
+ * @param {} appId 
+ * @param {*} param 
+ */
+export const updateAppInfoRequest = (appId, param) => {
+    const url = `/auth/web/app/${appId}`
+    return axios.request({
+        url,
+        method: 'put',
+        data: param
+    })
+}

@@ -137,6 +137,23 @@ export default [
     ]
   },
   {
+    path: '/app/:appId/expolit',
+    name: 'Expolit',
+    component: Main,
+    children: [
+      {
+        path: 'config',
+        name: 'ExpolitConfig',
+        meta: {
+          icon: 'md-clipboard',
+          title: '开发配置',
+          notCache: true
+        },
+        component: () => import('@/view/exploit-config/exploit-config.vue')
+      }
+    ]
+  },
+  {
     path: '/401',
     name: 'error_401',
     meta: {
