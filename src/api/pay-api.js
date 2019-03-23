@@ -110,7 +110,7 @@ export const getEventSubscriptionRequest = (appId) => {
  * @param {*} appId 
  * @param {*} param 
  */
-export const addOrUpdateEventSubscriptionRequest = (appId,param) => {
+export const addOrUpdateEventSubscriptionRequest = (appId, param) => {
     const url = `/notification/web/app/${appId}/subscription`
     return axios.request({
         url,
@@ -124,7 +124,7 @@ export const addOrUpdateEventSubscriptionRequest = (appId,param) => {
  * @param {*} appId 
  * @param {*} eventType 
  */
-export const deleteEventSubscriptionRequest = (appId,eventType) => {
+export const deleteEventSubscriptionRequest = (appId, eventType) => {
     const url = `/notification/web/app/${appId}/subscription/${eventType}`
     return axios.request({
         url,
@@ -180,5 +180,31 @@ export const updateAppInfoRequest = (appId, param) => {
         url,
         method: 'put',
         data: param
+    })
+}
+
+/**
+ * 获取api接口请求日志
+ * @param {} appId 
+ */
+export const getApiLogRequest = (appId, param) => {
+    const url = `/trade/web/${appId}/log/req`
+    return axios.request({
+        url,
+        method: 'get',
+        params: param
+    })
+}
+
+/**
+ * 获取平台异步通知日志
+ * @param {} appId 
+ */
+export const getPlatformNotifyLogRequest = (appId, param) => {
+    const url = `/trade/web/${appId}/log/notification`
+    return axios.request({
+        url,
+        method: 'get',
+        params: param
     })
 }

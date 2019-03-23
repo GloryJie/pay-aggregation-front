@@ -105,8 +105,7 @@ export default {
         // 取消订阅
         this.$Modal.confirm({
           title: "确认取消当前订阅的事件吗",
-          content:
-            "取消成功后正在进行的通知事件不会停止",
+          content: "取消成功后正在进行的通知事件不会停止",
           onOk() {
             self.deleteEventSubscribe(appId, event);
           },
@@ -134,7 +133,8 @@ export default {
             });
           }
         })
-        .catch(res => {});
+        .catch(err => {
+        });
     },
     addOrUpdateSunscription(appId, param) {
       addOrUpdateEventSubscriptionRequest(appId, param)
@@ -145,7 +145,11 @@ export default {
             title: "配置事件通知成功"
           });
         })
-        .catch(res => {});
+        .catch(err => {
+          let target = this.eventTypeList.find(item=> item.eventType === param.eventType);
+          target.notifyUrl = "";
+          target.status = false;
+        });
     },
     alterEventList(eventObject) {
       let target = this.eventTypeList.find(
