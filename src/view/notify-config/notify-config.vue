@@ -9,7 +9,7 @@
       :ref="item.eventType"
     >
       <Row type="flex" justify="center" align="middle">
-        <Col span="8">
+        <Col span="8" :xs="2" :sm="4" :md="6" :lg="12">
           <FormItem :label="item.eventTypeCN" prop="notifyUrl">
             <Input placeholder="事件通知地址" v-model="item.notifyUrl">
               <Select slot="prepend" style="width: 80px" v-model="item.httpType">
@@ -49,150 +49,149 @@ import {
   addOrUpdateEventSubscriptionRequest,
   getEventSubscriptionRequest,
   deleteEventSubscriptionRequest
-} from "@/api/pay-api";
-import { nextTick } from "q";
+} from '@/api/pay-api'
+import { nextTick } from 'q'
 export default {
-  name: "NotifyConfig",
-  data() {
+  name: 'NotifyConfig',
+  data () {
     return {
       eventTypeList: [
         {
-          eventType: "CHARGE_CHANGE_EVENT",
-          eventTypeCN: "支付成功事件:",
-          notifyUrl: "",
+          eventType: 'CHARGE_CHANGE_EVENT',
+          eventTypeCN: '支付成功事件:',
+          notifyUrl: '',
           status: false,
-          httpType: "https://"
+          httpType: 'https://'
         },
         {
-          eventType: "REFUND_CHANGE_EVENT",
-          eventTypeCN: "退款成功事件:",
-          notifyUrl: "",
+          eventType: 'REFUND_CHANGE_EVENT',
+          eventTypeCN: '退款成功事件:',
+          notifyUrl: '',
           status: false,
-          httpType: "https://"
+          httpType: 'https://'
         }
       ],
       rules: {
         notifyUrl: [
           {
             required: true,
-            message: "通知地址不能为空",
-            trigger: "blur"
+            message: '通知地址不能为空',
+            trigger: 'blur'
           }
         ]
       }
-    };
+    }
   },
   methods: {
-    changeSubscribeStatus(event) {
-      let appId = this.$store.state.pay.selectedAppId;
-      let param = {};
-      param.notifyUrl = event.httpType + event.notifyUrl;
-      param.eventType = event.eventType;
+    changeSubscribeStatus (event) {
+      let appId = this.$store.state.pay.selectedAppId
+      let param = {}
+      param.notifyUrl = event.httpType + event.notifyUrl
+      param.eventType = event.eventType
       if (event.status) {
-        //开通订阅
+        // 开通订阅
         this.$refs[event.eventType][0].validate(valid => {
           if (!valid) {
             // 稍后再刷新dom，立即更新不会生效
             this.$nextTick(() => {
-              event.status = false;
-            }, 20);
+              event.status = false
+            }, 20)
           } else {
-            this.addOrUpdateSunscription(appId, param);
+            this.addOrUpdateSunscription(appId, param)
           }
-        });
+        })
       } else {
-        let self = this;
+        let self = this
         // 取消订阅
         this.$Modal.confirm({
-          title: "确认取消当前订阅的事件吗",
-          content: "取消成功后正在进行的通知事件不会停止",
-          onOk() {
-            self.deleteEventSubscribe(appId, event);
+          title: '确认取消当前订阅的事件吗',
+          content: '取消成功后正在进行的通知事件不会停止',
+          onOk () {
+            self.deleteEventSubscribe(appId, event)
           },
-          onCancel() {
+          onCancel () {
             this.$nextTick(() => {
-              event.status = true;
-            }, 20);
+              event.status = true
+            }, 20)
           }
-        });
+        })
       }
     },
-    deleteEventSubscribe(appId, event) {
+    deleteEventSubscribe (appId, event) {
       deleteEventSubscriptionRequest(appId, event.eventType)
         .then(res => {
-          let data = res.data;
+          let data = res.data
           if (data) {
             // 修改本地数据
             this.$nextTick(() => {
-              event.status = false;
-              event.httpType = "https://";
-              event.notifyUrl = "";
-            }, 20);
+              event.status = false
+              event.httpType = 'https://'
+              event.notifyUrl = ''
+            }, 20)
             this.$Notice.success({
-              title: "取消订阅事件成功"
-            });
+              title: '取消订阅事件成功'
+            })
           }
         })
         .catch(err => {
-        });
+        })
     },
-    addOrUpdateSunscription(appId, param) {
+    addOrUpdateSunscription (appId, param) {
       addOrUpdateEventSubscriptionRequest(appId, param)
         .then(res => {
-          let data = res.data;
-          this.alterEventList(data);
+          let data = res.data
+          this.alterEventList(data)
           this.$Notice.success({
-            title: "配置事件通知成功"
-          });
+            title: '配置事件通知成功'
+          })
         })
         .catch(err => {
-          let target = this.eventTypeList.find(item=> item.eventType === param.eventType);
-          target.notifyUrl = "";
-          target.status = false;
-        });
+          let target = this.eventTypeList.find(item => item.eventType === param.eventType)
+          target.notifyUrl = ''
+          target.status = false
+        })
     },
-    alterEventList(eventObject) {
+    alterEventList (eventObject) {
       let target = this.eventTypeList.find(
         item => item.eventType === eventObject.eventType
-      );
-      target.status = true;
-      if (eventObject.notifyUrl.includes("https://")) {
-        target.httpType = "https://";
+      )
+      target.status = true
+      if (eventObject.notifyUrl.includes('https://')) {
+        target.httpType = 'https://'
         target.notifyUrl = eventObject.notifyUrl.slice(
-          "https://".length,
+          'https://'.length,
           eventObject.notifyUrl.length
-        );
+        )
       } else {
-        target.httpType = "http://";
+        target.httpType = 'http://'
         target.notifyUrl = eventObject.notifyUrl.slice(
-          "http://".length,
+          'http://'.length,
           eventObject.notifyUrl.length
-        );
+        )
       }
     },
-    getSubscribeEvent() {
-      let appId = this.$store.state.pay.selectedAppId;
+    getSubscribeEvent () {
+      let appId = this.$store.state.pay.selectedAppId
       getEventSubscriptionRequest(appId)
         .then(res => {
-          let data = res.data;
+          let data = res.data
           for (let key in data) {
-            this.alterEventList(data[key]);
+            this.alterEventList(data[key])
           }
         })
-        .catch(res => {});
+        .catch(res => {})
     },
-    updateNotifyUrl(event) {
-      let appId = this.$store.state.pay.selectedAppId;
-      let param = {};
-      param.eventType = event.eventType;
-      param.notifyUrl = event.httpType + event.notifyUrl;
+    updateNotifyUrl (event) {
+      let appId = this.$store.state.pay.selectedAppId
+      let param = {}
+      param.eventType = event.eventType
+      param.notifyUrl = event.httpType + event.notifyUrl
 
-      this.addOrUpdateSunscription(appId, param);
+      this.addOrUpdateSunscription(appId, param)
     }
   },
-  mounted() {
-    this.getSubscribeEvent();
+  mounted () {
+    this.getSubscribeEvent()
   }
-};
+}
 </script>
-

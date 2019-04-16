@@ -22,7 +22,7 @@
       <Layout class="main-layout-con">
         <Content class="content-wrapper" style="padding: 10px 60px">
           <Row type="flex" justify="center">
-            <Col span="5" v-for="item in appList" :key="item.appId">
+            <Col span="5" :xs="2" :sm="4" :md="6" :lg="8" v-for="item in appList" :key="item.appId">
               <app-card
                 :name="item.name"
                 :appId="item.appId"
@@ -67,32 +67,31 @@
   </Layout>
 </template>
 
-
 <script>
-import User from "@/components/main/components/user";
-import Fullscreen from "@/components/main/components/fullscreen";
-import { mapMutations, mapActions, mapGetters } from "vuex";
-import { getNewTagList, getNextRoute, routeEqual } from "@/libs/util";
-import { getAppMasterListRequest, addNewAppRequest } from "@/api/pay-api";
-import minLogo from "@/assets/images/logo-min.jpg";
-import maxLogo from "@/assets/images/logo.jpg";
-import AppCard from "@/components/app-card";
+import User from '@/components/main/components/user'
+import Fullscreen from '@/components/main/components/fullscreen'
+import { mapMutations, mapActions, mapGetters } from 'vuex'
+import { getNewTagList, getNextRoute, routeEqual } from '@/libs/util'
+import { getAppMasterListRequest, addNewAppRequest } from '@/api/pay-api'
+import minLogo from '@/assets/images/logo-min.jpg'
+import maxLogo from '@/assets/images/logo.jpg'
+import AppCard from '@/components/app-card'
 export default {
-  name: "AppList",
+  name: 'AppList',
   components: {
     Fullscreen,
     User,
     AppCard
   },
-  data() {
+  data () {
     return {
       maxLogo,
       isFullscreen: false,
       appList: [],
       showAddAppDrawer: false,
       newAppParam: {
-        name: "",
-        description: ""
+        name: '',
+        description: ''
       },
       rules: {
         name: [
@@ -100,8 +99,8 @@ export default {
             required: true,
             min: 2,
             max: 32,
-            message: "应用名称至少2个字,至多16",
-            trigger: "blur"
+            message: '应用名称至少2个字,至多16',
+            trigger: 'blur'
           }
         ],
         description: [
@@ -109,67 +108,67 @@ export default {
             required: true,
             min: 4,
             max: 100,
-            message: "应用描述至少4个字,至多100",
-            trigger: "blur"
+            message: '应用描述至少4个字,至多100',
+            trigger: 'blur'
           }
         ]
       }
-    };
+    }
   },
   computed: {
-    userAvator() {
-      return this.$store.state.user.avatorImgPath;
+    userAvator () {
+      return this.$store.state.user.avatorImgPath
     }
   },
   methods: {
-    ...mapMutations(["setSelectedAppId", "setSelectedApp"]),
-    handleSelectedApp(appId) {
-      this.handleSelected(appId);
-      this.$router.push({ name: "AppHome", params: { appId } });
+    ...mapMutations(['setSelectedAppId', 'setSelectedApp']),
+    handleSelectedApp (appId) {
+      this.handleSelected(appId)
+      this.$router.push({ name: 'AppHome', params: { appId } })
     },
-    handleTradeOperation(appId) {
-      this.handleSelected(appId);
-      this.$router.push({ name: "ChargeManage", params: { appId } });
+    handleTradeOperation (appId) {
+      this.handleSelected(appId)
+      this.$router.push({ name: 'ChargeManage', params: { appId } })
     },
-    handleChannelConfigOperation(appId) {
-      this.handleSelected(appId);
-      this.$router.push({ name: "ChannelConfig", params: { appId } });
+    handleChannelConfigOperation (appId) {
+      this.handleSelected(appId)
+      this.$router.push({ name: 'ChannelConfig', params: { appId } })
     },
-    handleSelected(appId) {
-      this.setSelectedAppId(appId);
-      let app = this.appList.find(item => item.appId === appId);
-      this.setSelectedApp(app);
+    handleSelected (appId) {
+      this.setSelectedAppId(appId)
+      let app = this.appList.find(item => item.appId === appId)
+      this.setSelectedApp(app)
     },
-    getAppMasterList() {
+    getAppMasterList () {
       getAppMasterListRequest()
         .then(res => {
-          let data = res.data;
-          this.appList = data;
+          let data = res.data
+          this.appList = data
         })
-        .catch(res => {});
+        .catch(res => {})
     },
-    confirmAddNewAPP() {
-      this.$refs["newAppForm"].validate(valid => {
+    confirmAddNewAPP () {
+      this.$refs['newAppForm'].validate(valid => {
         if (valid) {
           addNewAppRequest(this.newAppParam)
             .then(res => {
-              let data = res.data;
-              this.appList.push(data);
-              this.showAddAppDrawer = false;
+              let data = res.data
+              this.appList.push(data)
+              this.showAddAppDrawer = false
               this.$Notice.success({
-                title: "创建应用成功",
-                desc: "请前往应用主页进行相应配置"
-              });
+                title: '创建应用成功',
+                desc: '请前往应用主页进行相应配置'
+              })
             })
-            .catch(res => {});
+            .catch(res => {})
         }
-      });
+      })
     }
   },
-  mounted() {
-    this.getAppMasterList();
+  mounted () {
+    this.getAppMasterList()
   }
-};
+}
 </script>
 
 <style lang="stylus" scoped>
@@ -202,4 +201,3 @@ export default {
   text-align right
   background #fff
 </style>
-
