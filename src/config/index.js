@@ -14,9 +14,9 @@ export default {
    */
   baseUrl: {
     dev: '',
-    pro: 'https://produce.com'
+    pro: 'http://47.101.201.220:12000/pay'
   },
-  basicAuth:{
+  basicAuth: {
     username: 'vue-app',
     password: 'abc'
   },
