@@ -9,11 +9,12 @@ export const login = ({ userName, password }) => {
     grant_type: 'password',
     scope: 'all'
   }
-  let formData = new URLSearchParams();
-  for(let key in data){
-    formData.append(key,data[key])
+  let formData = new URLSearchParams()
+  for (let key in data) {
+    formData.append(key, data[key])
   }
   return axios.request({
+    // url: '/oauth/token',
     url: '/auth/oauth/token',
     data: formData,
     method: 'post',

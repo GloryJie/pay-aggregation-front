@@ -16,11 +16,11 @@ const addErrorLog = errorInfo => {
 }
 
 class HttpRequest {
-  constructor(baseUrl = baseURL) {
+  constructor (baseUrl = baseURL) {
     this.baseUrl = baseUrl
     this.queue = {}
   }
-  getInsideConfig() {
+  getInsideConfig () {
     const config = {
       baseURL: this.baseUrl,
       headers: {
@@ -29,17 +29,17 @@ class HttpRequest {
     }
     return config
   }
-  destroy(url) {
+  destroy (url) {
     delete this.queue[url]
     if (!Object.keys(this.queue).length) {
       // Spin.hide()
     }
   }
-  interceptors(instance, url) {
+  interceptors (instance, url) {
     // 请求拦截
     instance.interceptors.request.use(config => {
       if (!config.url.includes('token') || !config.url.includes('logout')) {
-        config.headers['Authorization'] = 'Bearer' + store.state.user.token;
+        config.headers['Authorization'] = 'Bearer' + store.state.user.token
       }
       // 添加全局的loading...
       if (!Object.keys(this.queue).length) {
@@ -54,11 +54,14 @@ class HttpRequest {
     instance.interceptors.response.use(res => {
       this.destroy(url)
       const { status } = res
-      let data = res.data.data == undefined ? res.data : res.data.data;
+      let data = res.data.data == undefined ? res.data : res.data.data
       return { data, status }
     }, error => {
       this.destroy(url)
-      let errorMsg = error.response.data.message;
+      let errorMsg = error.response.data.message
+      if (errorMsg === undefined) {
+        errorMsg = error.response.data.error
+      }
       // addErrorLog(error.response)
       // 统一错误通知notify
       Notice.error({
@@ -67,7 +70,7 @@ class HttpRequest {
       return Promise.reject(error)
     })
   }
-  request(options) {
+  request (options) {
     const instance = axios.create()
     options = Object.assign(this.getInsideConfig(), options)
     this.interceptors(instance, options.url)
