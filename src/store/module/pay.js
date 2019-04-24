@@ -1,15 +1,23 @@
+import { setAppId, getAppId } from '@/libs/util'
+
 export default {
-    state: {
-        selectedAppId: 0,
-        selectedApp: {}
+  state: {
+    selectedAppId: getAppId(),
+    selectedApp: {}
+  },
+  getters: {
+    getSelectedAppId: state => {
+      return state.selectedAppId
+    }
+  },
+  mutations: {
+    setSelectedAppId (state, appId) {
+      state.selectedAppId = appId
+      setAppId(appId)
     },
-    mutations: {
-        setSelectedAppId(state, appId) {
-            state.selectedAppId = appId
-        },
-        setSelectedApp(state, app) {
-            state.selectedApp = app
-        }
-    },
-    actions: {}
+    setSelectedApp (state, app) {
+      state.selectedApp = app
+    }
+  },
+  actions: {}
 }

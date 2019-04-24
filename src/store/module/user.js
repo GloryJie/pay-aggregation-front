@@ -10,6 +10,11 @@ export default {
     access: '',
     hasGetInfo: false
   },
+  getters: {
+    getAccessToken: state => {
+      return state.token
+    }
+  },
   mutations: {
     setAvator (state, avatorPath) {
       state.avatorImgPath = avatorPath
@@ -33,7 +38,7 @@ export default {
   },
   actions: {
     // 登录
-    handleLogin ({ commit }, {userName, password}) {
+    handleLogin ({ commit }, { userName, password }) {
       userName = userName.trim()
       return new Promise((resolve, reject) => {
         login({
