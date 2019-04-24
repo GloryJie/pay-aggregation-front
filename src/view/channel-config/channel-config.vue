@@ -39,11 +39,19 @@
       :channel="selectedAlipayChannel"
       @confirm="handleConfigConfirm"
     />
+
+    <unionpay-config-drawer
+      ref="unionpayDrawerRef"
+      v-model="showUnionpayChannelConfigDrawer"
+      :channel="selectedUnionpayChannel"
+      @confirm="handleConfigConfirm"
+    />
   </div>
 </template>
 
 <script>
 import AlipayConfigDrawer from '@/components/alipay-config-drawer'
+import UnionpayConfigDrawer from '@/components/unionpay-config-drawer'
 import ChannelCard from '@/components/channel-card'
 import { CHANNEL_ENUM } from '@/libs/StatusTransform'
 import {
@@ -58,7 +66,8 @@ export default {
   components: {
     CHANNEL_ENUM,
     ChannelCard,
-    AlipayConfigDrawer
+    AlipayConfigDrawer,
+    UnionpayConfigDrawer
   },
   data () {
     return {
@@ -251,7 +260,7 @@ export default {
           isOpened: false,
           startDate: '',
           stopDate: '',
-          isAvailable: false
+          isAvailable: true
         },
         {
           platform: '银联',
@@ -264,7 +273,7 @@ export default {
           isOpened: false,
           startDate: '',
           stopDate: '',
-          isAvailable: false
+          isAvailable: true
         },
         {
           platform: '银联',
@@ -282,6 +291,8 @@ export default {
         }
       ],
       showAlipayChannelConfigDrawer: false,
+      showUnionpayChannelConfigDrawer: false,
+      showWxpayChannelConfigDrawer: false,
       showDeleteModal: false,
       deleteChannel: '',
       alipayChannelConfig: {
@@ -291,7 +302,9 @@ export default {
         merchantPublicKey: '',
         type: 'RSA2'
       },
-      selectedAlipayChannel: {}
+      selectedAlipayChannel: {},
+      selectedUnionpayChannel: {},
+      selectedWxpayChannel: {}
     }
   },
   computed: {
@@ -360,6 +373,9 @@ export default {
       if (channel.platform === '支付宝') {
         this.selectedAlipayChannel = channel
         this.showAlipayChannelConfigDrawer = true
+      }else if (channel.platform === '银联'){
+        this.selectedUnionpayChannel = channel
+        this.showUnionpayChannelConfigDrawer = true
       }
     },
     handleConfigConfirm (channel, config) {
@@ -390,7 +406,7 @@ export default {
             this.closeAllDrawer()
             this.alterChannelListByOpenedObject(res.data)
             this.$Notice.success({
-              title: '配置新成功'
+              title: '添加配置成功'
             })
           })
           .catch(res => {
@@ -426,6 +442,8 @@ export default {
     },
     closeAllDrawer () {
       this.showAlipayChannelConfigDrawer = false
+      this.showUnionpayChannelConfigDrawer = false
+      this.showWxpayChannelConfigDrawer = false
     }
   },
   mounted () {

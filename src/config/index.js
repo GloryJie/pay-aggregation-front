@@ -13,7 +13,7 @@ export default {
    * @description api请求基础路径
    */
   baseUrl: {
-    dev: '',
+    dev: 'http://localhost:12000/pay',
     pro: 'http://47.101.201.220:12000/pay'
   },
   basicAuth: {

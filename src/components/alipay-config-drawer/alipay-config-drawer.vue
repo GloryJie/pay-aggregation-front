@@ -2,13 +2,13 @@
   <Drawer title="配置详情" width="450" :closable="true" v-model="showDrawer" :scrollable="true">
     <Form ref="configForm" :model="alipayChannelConfig" :rules="rules" :label-width="100">
       <FormItem label="商户号：" prop="merchantId">
-        <Input v-model="alipayChannelConfig.merchantId"/>
+        <Input v-model="alipayChannelConfig.merchantId" :disabled="channel.isOpened"/>
       </FormItem>
 
       <FormItem label="加密类型：" prop="type">
         <RadioGroup v-model="alipayChannelConfig.type">
-          <Radio label="RSA1"></Radio>
-          <Radio label="RSA2"></Radio>
+          <Radio label="RSA1" :disabled="channel.isOpened"></Radio>
+          <Radio label="RSA2" :disabled="channel.isOpened"></Radio>
         </RadioGroup>
       </FormItem>
 
@@ -20,11 +20,11 @@
       </FormItem>
 
       <FormItem label="支付宝私钥：" prop="merchantPrivateKey">
-        <Input v-model="alipayChannelConfig.merchantPrivateKey" type="textarea" :rows="15"/>
+        <Input v-model="alipayChannelConfig.merchantPrivateKey" type="textarea" :rows="15" :disabled="channel.isOpened"/>
       </FormItem>
 
-      <FormItem label="支付宝公钥：" prop="merchantPublicKey">
-        <Input v-model="alipayChannelConfig.merchantPublicKey" type="textarea" :rows="10"/>
+      <FormItem label="支付宝公钥：" prop="merchantPublicKey" >
+        <Input v-model="alipayChannelConfig.merchantPublicKey" type="textarea" :rows="10" :disabled="channel.isOpened"/>
       </FormItem>
     </Form>
 
