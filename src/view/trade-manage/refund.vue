@@ -4,6 +4,15 @@
       <Form :label-width="80" v-model="conditionalQueryParam">
         <Row :gutter="16">
           <Col span="6">
+            <FormItem label="子商户">
+              <Cascader :data="subAppList"
+                        v-model="subAppId"
+                        change-on-select
+                        filterable>
+              </Cascader>
+            </FormItem>
+          </Col>
+          <Col span="6">
             <FormItem label="退款单号">
               <Input :clearable="true" v-model="conditionalQueryParam.refundNo" class="form-input"/>
             </FormItem>
@@ -18,6 +27,8 @@
               <Input :clearable="true" v-model="conditionalQueryParam.orderNo" class="form-input"/>
             </FormItem>
           </Col>
+        </Row>
+        <Row :gutter="16" type="flex" justify="start">
           <Col span="6">
             <FormItem label="退款渠道">
               <Select v-model="conditionalQueryParam.channel" class="form-input" clearable>
@@ -25,8 +36,6 @@
               </Select>
             </FormItem>
           </Col>
-        </Row>
-        <Row :gutter="16" type="flex" justify="start">
           <Col span="6">
             <FormItem label="退款时间">
               <DatePicker
@@ -48,13 +57,15 @@
               </Select>
             </FormItem>
           </Col>
-          <Col span="6" style="text-align:center" offset="6">
+        </Row>
+        <Row type="flex" justify="end">
+          <Col span="6" push="2">
             <Button @click="getRefundList" type="info" style="width: 50%">筛选</Button>
           </Col>
         </Row>
       </Form>
     </div>
-    <div class="content">
+    <div class="content" style="margin-top: 6px">
       <!-- 数据表格 -->
       <Table
         stripe
@@ -87,7 +98,9 @@ import {
   CHANNEL_ENUM,
   REFUND_STATUS_ENUM
 } from "@/libs/StatusTransform";
-import { getRefundListRequest } from "@/api/pay-api";
+import { getRefundListRequest, getAppTreeRequest } from "@/api/pay-api";
+import { mapGetters } from 'vuex'
+
 export default {
   name: "RefundManage",
   data() {
@@ -147,7 +160,9 @@ export default {
           key: "timeSucceed"
         }
       ],
-      refundList: []
+      refundList: [],
+      subAppList: [],
+      subAppId: []
     };
   },
   methods: {
@@ -175,9 +190,13 @@ export default {
     getRefundList() {
       // 请求获取支付单数据
       let param = {};
-      let appId = this.$store.state.pay.selectedAppId;
       // appId必填
-      this.conditionalQueryParam.appId = appId;
+      this.conditionalQueryParam.appId = this.selectedAppId;
+
+      // 指定子商户
+      if (this.subAppId.length > 0) {
+        this.conditionalQueryParam.subAppId = this.subAppId[this.subAppId.length -1];
+      }
 
       param.startPage = this.pageInfo.startPage;
       param.pageSize = this.pageInfo.pageSize;
@@ -207,12 +226,40 @@ export default {
       // newDate为数组格式，第一个为startDate, 第二个为endDate
       this.conditionalQueryParam.startDate = newDate[0];
       this.conditionalQueryParam.endDate = newDate[1];
+    },
+    buildAppTreeData (data) {
+      data.forEach(item => {
+        item.value = item.appId
+        item.label = item.name
+      })
+      // 转换后台数据为组件可识别数据
+      for (let i = 0; i < data.length; i++) {
+        data[i].children = []
+        for (let j = 0; j < data.length; j++) {
+          if (data[i].appId === data[j].parentAppId) {
+            data[i].children.push(data[j])
+          }
+        }
+      }
+      const root = data.find(item => item.type === 'MASTER')
+      this.subAppList = [root]
+    },
+    getSubAppList(){
+      getAppTreeRequest(this.selectedAppId).then(res => {
+        this.buildAppTreeData(res.data)
+      })
     }
+  },
+  computed: {
+    ...mapGetters({
+      selectedAppId: 'getSelectedAppId'
+    })
   },
   mounted() {
     // 每次挂载组件时都进行数据请求
     // TODO 首次获取一周的数据，避免后台数据量过大
     this.getRefundList();
+    this.getSubAppList();
   }
 };
 </script>

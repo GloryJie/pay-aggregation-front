@@ -12,6 +12,7 @@ import installPlugin from '@/plugin'
 import 'iview/dist/styles/iview.css'
 import './index.less'
 import '@/assets/icons/iconfont.css'
+import 'vue-orgchart/dist/style.min.css'
 // 实际打包时应该不引入mock
 /* eslint-disable */
 if (process.env.NODE_ENV !== 'production') require('@/mock')
@@ -35,6 +36,8 @@ Vue.prototype.$config = config
  * 注册指令
  */
 importDirective(Vue)
+
+
 
 /* eslint-disable no-new */
 new Vue({

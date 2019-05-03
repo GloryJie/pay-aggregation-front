@@ -7,6 +7,7 @@ export default {
   },
   getters: {
     getSelectedAppId: state => {
+      console.log('state: ' + state.selectedAppId)
       return state.selectedAppId
     }
   },

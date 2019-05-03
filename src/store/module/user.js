@@ -4,8 +4,8 @@ import { setToken, getToken } from '@/libs/util'
 export default {
   state: {
     userName: '',
-    userId: '',
-    avatorImgPath: '',
+    userNo: '',
+    avatarImgPath: '',
     token: getToken(),
     access: '',
     hasGetInfo: false
@@ -16,10 +16,10 @@ export default {
     }
   },
   mutations: {
-    setAvator (state, avatorPath) {
+    setAvatar (state, avatorPath) {
       state.avatorImgPath = avatorPath
     },
-    setUserId (state, id) {
+    setUserNo (state, id) {
       state.userId = id
     },
     setUserName (state, name) {
@@ -75,10 +75,10 @@ export default {
         try {
           getUserInfo(state.token).then(res => {
             const data = res.data
-            commit('setAvator', data.avator)
-            commit('setUserName', data.name)
-            commit('setUserId', data.user_id)
-            commit('setAccess', data.access)
+            commit('setAvatar', data.avatar)
+            commit('setUserName', data.nickName)
+            commit('setUserNo', data.userNo)
+            commit('setAccess', ['super_admin'])
             commit('setHasGetInfo', true)
             resolve(data)
           }).catch(err => {

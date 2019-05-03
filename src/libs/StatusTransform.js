@@ -15,7 +15,9 @@ export const CHANNEL_ENUM = {
     'ALIPAY_WAP': '支付宝手机H5支付',
     'ALIPAY_SCAN_CODE': '支付宝扫码支付',
     'ALIPAY_BAR_CODE': '支付宝条码支付',
-    'ALIPAY_APP': 'APP支付'
+    'ALIPAY_APP': 'APP支付',
+    'UNIONPAY_WAP': '银联WAP手机支付',
+    'UNIONPAY_PAGE': '银联PC网页支付'
 }
 
 export const REFUND_STATUS_ENUM = {

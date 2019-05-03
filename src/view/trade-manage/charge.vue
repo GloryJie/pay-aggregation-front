@@ -4,6 +4,15 @@
       <Form :label-width="80" v-model="conditionalQueryParam">
         <Row :gutter="16">
           <Col span="8">
+            <FormItem label="子商户">
+              <Cascader :data="subAppList"
+                        v-model="subAppId"
+                        change-on-select
+                        filterable>
+              </Cascader>
+            </FormItem>
+          </Col>
+          <Col span="8">
             <FormItem label="支付单号">
               <Input :clearable="true" v-model="conditionalQueryParam.chargeNo" class="form-input"/>
             </FormItem>
@@ -13,6 +22,8 @@
               <Input :clearable="true" v-model="conditionalQueryParam.orderNo" class="form-input"/>
             </FormItem>
           </Col>
+        </Row>
+        <Row :gutter="16" type="flex" justify="start">
           <Col span="8">
             <FormItem label="支付渠道">
               <Select v-model="conditionalQueryParam.channel" class="form-input" clearable>
@@ -20,8 +31,7 @@
               </Select>
             </FormItem>
           </Col>
-        </Row>
-        <Row :gutter="16" type="flex" justify="start">
+
           <Col span="8">
             <FormItem label="交易时间">
               <DatePicker
@@ -39,17 +49,21 @@
                   v-for="(value,key) in CHARGE_STATUS_ENUM"
                   :value="key"
                   :key="key"
-                >{{ value }}</Option>
+                >{{ value }}
+                </Option>
               </Select>
             </FormItem>
           </Col>
-          <Col span="6" style="text-align:center">
+
+        </Row>
+        <Row type="flex" justify="end">
+          <Col span="8" push="2">
             <Button @click="getChargeList" type="info" style="width: 50%">筛选</Button>
           </Col>
         </Row>
       </Form>
     </div>
-    <div class="content">
+    <div class="content" style="margin-top: 10px">
       <!-- 数据表格 -->
       <Table
         stripe
@@ -122,165 +136,204 @@
 </template>
 
 <script>
-import {
-  transformChargeStatus,
-  transformChannel,
-  transformRefundStatus,
-  CHANNEL_ENUM,
-  CHARGE_STATUS_ENUM
-} from "@/libs/StatusTransform";
-import { getChargeListRequest } from "@/api/pay-api";
-export default {
-  name: "ChargeManage",
-  data() {
-    return {
-      CHANNEL_ENUM,
-      CHARGE_STATUS_ENUM,
-      chargeDrawerStyle: {
-        height: "calc(100% - 55px)",
-        overflow: "auto",
-        paddingBottom: "53px",
-        position: "static"
-      },
-      pageInfo: {
-        total: 35,
-        startPage: 1,
-        pageSize: 10
-      },
-      conditionalQueryParam: {
-        appId: 0,
-        status: "",
-        channel: "",
-        orderNo: "",
-        chargeNo: "",
-        startDate: "",
-        endDate: ""
-      },
-      openChargeDrawer: false,
-      selectedCharge: {},
-      tableColumn: [
-        {
-          title: "支付单号",
-          key: "chargeNo"
-        },
-        {
-          title: "商户订单号",
-          key: "orderNo"
-        },
-        {
-          title: "商品标题",
-          key: "subject"
-        },
-        {
-          title: "金额",
-          key: "amount"
-        },
-        {
-          title: "支付渠道",
-          key: "channel"
-        },
-        {
-          title: "支付状态",
-          key: "status"
-        },
-        {
-          title: "创建时间",
-          key: "timeCreated"
-        }
-      ],
-      chargeList: []
-    };
-  },
-  methods: {
-    selectSingleCharge(chargeData) {
-      // 单击选择某条支付单时
-      this.selectedCharge = chargeData;
-      this.openChargeDrawer = true;
-    },
-    translate() {
-      // 将英文表示翻译成中文
-      this.chargeList.forEach(item => {
-        item.status = transformChargeStatus(item.status);
-        item.channel = transformChannel(item.channel);
-        item.amount = parseFloat(item.amount / 100).toFixed(2);
-        if(item.actualAmount){
-          item.actualAmount = parseFloat(item.actualAmount / 100).toFixed(2);
-        }
-        if (item.refundList) {
-          item.refundList.forEach(refund => {
-            refund.channel = transformChannel(refund.channel);
-            refund.status = transformRefundStatus(refund.status);
-            refund.amount = parseFloat(refund.amount / 100).toFixed(2);
-          });
-        }
-      });
-    },
-    pageSizeChange(newPageSize) {
-      // 一页显示的数据大小改变
-      this.pageInfo.pageSize = newPageSize;
-      this.getChargeList();
-    },
-    startPageChange(newStartPage) {
-      // 页码改变
-      this.pageInfo.startPage = newStartPage;
-      this.getChargeList();
-    },
-    getChargeList() {
-      // 请求获取支付单数据
-      let param = {};
-      let appId = this.$store.state.pay.selectedAppId;
-      // appId必填
-      this.conditionalQueryParam.appId = appId;
+  import {
+    transformChargeStatus,
+    transformChannel,
+    transformRefundStatus,
+    CHANNEL_ENUM,
+    CHARGE_STATUS_ENUM
+  } from '@/libs/StatusTransform'
+  import { getChargeListRequest,getAppTreeRequest } from '@/api/pay-api'
+  import CollapsedMenu from '../../components/main/components/side-menu/collapsed-menu'
+  import { mapGetters } from 'vuex'
 
-      param.startPage = this.pageInfo.startPage;
-      param.pageSize = this.pageInfo.pageSize;
 
-      // 查找条件筛选过滤
-      for (let i in this.conditionalQueryParam) {
-        if (
-          this.conditionalQueryParam[i] != "" &&
-          this.conditionalQueryParam[i] != undefined
-        ) {
-          param[i] = this.conditionalQueryParam[i];
-        }
+  export default {
+    name: 'ChargeManage',
+    components: { CollapsedMenu },
+    data () {
+      return {
+        CHANNEL_ENUM,
+        CHARGE_STATUS_ENUM,
+        chargeDrawerStyle: {
+          height: 'calc(100% - 55px)',
+          overflow: 'auto',
+          paddingBottom: '53px',
+          position: 'static'
+        },
+        pageInfo: {
+          total: 35,
+          startPage: 1,
+          pageSize: 10
+        },
+        conditionalQueryParam: {
+          appId: 0,
+          subAppId: '',
+          status: '',
+          channel: '',
+          orderNo: '',
+          chargeNo: '',
+          startDate: '',
+          endDate: ''
+        },
+        openChargeDrawer: false,
+        selectedCharge: {},
+        tableColumn: [
+          {
+            title: '支付单号',
+            key: 'chargeNo'
+          },
+          {
+            title: '商户订单号',
+            key: 'orderNo'
+          },
+          {
+            title: '商品标题',
+            key: 'subject'
+          },
+          {
+            title: '金额',
+            key: 'amount'
+          },
+          {
+            title: '支付渠道',
+            key: 'channel'
+          },
+          {
+            title: '支付状态',
+            key: 'status'
+          },
+          {
+            title: '创建时间',
+            key: 'timeCreated'
+          }
+        ],
+        chargeList: [],
+        subAppList: [],
+        subAppId: []
       }
-      // API 请求
-      getChargeListRequest(param)
-        .then(res => {
-          this.chargeList = res.data.list;
-          this.pageInfo.total = res.data.total;
-          this.translate();
-        })
-        .catch(err => {
-          // TODO 异常需要Notify警示
-          console.log(err);
-        });
     },
-    tradeTimeQueryParamChange(newDate) {
-      // newDate为数组格式，第一个为startDate, 第二个为endDate
-      this.conditionalQueryParam.startDate = newDate[0];
-      this.conditionalQueryParam.endDate = newDate[1];
+    methods: {
+      selectSingleCharge (chargeData) {
+        // 单击选择某条支付单时
+        this.selectedCharge = chargeData
+        this.openChargeDrawer = true
+      },
+      translate () {
+        // 将英文表示翻译成中文
+        this.chargeList.forEach(item => {
+          item.status = transformChargeStatus(item.status)
+          item.channel = transformChannel(item.channel)
+          item.amount = parseFloat(item.amount / 100).toFixed(2)
+          if (item.actualAmount) {
+            item.actualAmount = parseFloat(item.actualAmount / 100).toFixed(2)
+          }
+          if (item.refundList) {
+            item.refundList.forEach(refund => {
+              refund.channel = transformChannel(refund.channel)
+              refund.status = transformRefundStatus(refund.status)
+              refund.amount = parseFloat(refund.amount / 100).toFixed(2)
+            })
+          }
+        })
+      },
+      pageSizeChange (newPageSize) {
+        // 一页显示的数据大小改变
+        this.pageInfo.pageSize = newPageSize
+        this.getChargeList()
+      },
+      startPageChange (newStartPage) {
+        // 页码改变
+        this.pageInfo.startPage = newStartPage
+        this.getChargeList()
+      },
+      getChargeList () {
+        // 请求获取支付单数据
+        let param = {}
+        // appId必填
+        this.conditionalQueryParam.appId = this.selectedAppId;
+        // 指定子商户
+        if (this.subAppId.length > 0) {
+          this.conditionalQueryParam.subAppId = this.subAppId[this.subAppId.length -1];
+        }
+        param.startPage = this.pageInfo.startPage
+        param.pageSize = this.pageInfo.pageSize
+
+        // 查找条件筛选过滤
+        for (let i in this.conditionalQueryParam) {
+          if (
+            this.conditionalQueryParam[i] != '' &&
+            this.conditionalQueryParam[i] != undefined
+          ) {
+            param[i] = this.conditionalQueryParam[i]
+          }
+        }
+        // API 请求
+        getChargeListRequest(param)
+          .then(res => {
+            this.chargeList = res.data.list
+            this.pageInfo.total = res.data.total
+            this.translate()
+          })
+          .catch(err => {
+            // TODO 异常需要Notify警示
+            console.log(err)
+          })
+      },
+      tradeTimeQueryParamChange (newDate) {
+        // newDate为数组格式，第一个为startDate, 第二个为endDate
+        this.conditionalQueryParam.startDate = newDate[0]
+        this.conditionalQueryParam.endDate = newDate[1]
+      },
+      buildAppTreeData (data) {
+        data.forEach(item => {
+          item.value = item.appId
+          item.label = item.name
+        })
+        // 转换后台数据为组件可识别数据
+        for (let i = 0; i < data.length; i++) {
+          data[i].children = []
+          for (let j = 0; j < data.length; j++) {
+            if (data[i].appId === data[j].parentAppId) {
+              data[i].children.push(data[j])
+            }
+          }
+        }
+        const root = data.find(item => item.type === 'MASTER')
+        this.subAppList = [root]
+      },
+      getSubAppList(){
+        getAppTreeRequest(this.selectedAppId).then(res => {
+          this.buildAppTreeData(res.data)
+        })
+      }
+    },
+    computed: {
+      ...mapGetters({
+        selectedAppId: 'getSelectedAppId'
+      })
+    },
+    mounted () {
+      // 每次挂载组件时都进行数据请求
+      // TODO 首次获取一周的数据，避免后台数据量过大
+      this.getChargeList()
+      this.getSubAppList()
     }
-  },
-  mounted() {
-    // 每次挂载组件时都进行数据请求
-    // TODO 首次获取一周的数据，避免后台数据量过大
-    this.getChargeList();
   }
-};
 </script>
 
 <style lang="stylus" scoped>
-.form-input
-  width 70%
-.drawer-footer
-  width 400px
-  position fixed
-  bottom 0
-  right 0
-  border-top 1px solid #e8e8e8
-  padding 10px 16px
-  text-align right
-  background #fff
+  .form-input
+    width 70%
+
+  .drawer-footer
+    width 400px
+    position fixed
+    bottom 0
+    right 0
+    border-top 1px solid #e8e8e8
+    padding 10px 16px
+    text-align right
+    background #fff
 </style>
 

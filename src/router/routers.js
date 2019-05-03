@@ -120,6 +120,37 @@ export default [
     ]
   },
   {
+    path: '/app/:appId/merchant',
+    name: 'Merchant',
+    component: Main,
+    meta: {
+      icon: 'md-menu',
+      title: '子商户'
+    },
+    children: [
+      {
+        path: 'overview',
+        name: 'SubMerchantOverview',
+        meta: {
+          icon: 'md-construct',
+          title: '层级概览',
+          notCache: true
+        },
+        component: () => import('@/view/sub-merchant/sub-merchant.vue')
+      },
+      {
+        path: 'edit',
+        name: 'SubMerchantEdit',
+        meta: {
+          icon: 'md-construct',
+          title: '子应用操作',
+          notCache: true
+        },
+        component: () => import('@/view/sub-merchant/edit-merchant-info.vue')
+      }
+    ]
+  },
+  {
     path: '/app/:appId/log',
     name: 'Log',
     component: Main,
