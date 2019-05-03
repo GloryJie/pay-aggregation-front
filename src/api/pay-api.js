@@ -234,3 +234,66 @@ export const getAppTreeRequest = (appId) => {
     method: 'get'
   })
 }
+
+
+/************统计数据接口******************/
+
+/**
+ * 获取今日交易数据统计
+ * @param appId
+ * @param param
+ * @returns {never}
+ */
+export const getTodayTradeStatRequest = (appId, param) => {
+  const url = `/trade/web/statistics/${appId}/today`
+  return axios.request({
+    url,
+    method: 'get',
+    params: param
+  })
+}
+
+/**
+ * 获取历史交易数据统计
+ * @param appId
+ * @param param
+ * @returns {never}
+ */
+export const getTradeHistoryStatRequest = (appId, param) => {
+  const url = `/trade/web/statistics/${appId}/history`
+  return axios.request({
+    url,
+    method: 'get',
+    params: param
+  })
+}
+
+/**
+ * 获取交易平台数据统计
+ * @param appId
+ * @param param
+ * @returns {never}
+ */
+export const getChannelTradeStatRequest = (appId, param) => {
+  const url = `/trade/web/statistics/${appId}/channel`
+  return axios.request({
+    url,
+    method: 'get',
+    params: param
+  })
+}
+
+/**
+ * 获取交易平台数据统计
+ * @param appId
+ * @param param
+ * @returns {never}
+ */
+export const getSubAppTradeStatRequest = (appId, param) => {
+  const url = `/trade/web/statistics/${appId}/sub`
+  return axios.request({
+    url,
+    method: 'get',
+    params: param
+  })
+}

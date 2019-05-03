@@ -1,7 +1,8 @@
 <template>
   <div>
     <Row :gutter="20">
-      <i-col :xs="12" :md="8" :lg="4" v-for="(infor, i) in inforCardData" :key="`infor-${i}`" style="height: 120px;padding-bottom: 10px;">
+      <i-col :xs="14" :md="8" :lg="6" v-for="(infor, i) in todayTradeData" :key="`infor-${i}`"
+             style="height: 120px;padding-bottom: 10px;">
         <infor-card shadow :color="infor.color" :icon="infor.icon" :icon-size="36">
           <count-to :end="infor.count" count-class="count-style"/>
           <p>{{ infor.title }}</p>
@@ -11,73 +12,171 @@
     <Row :gutter="20" style="margin-top: 10px;">
       <i-col :md="24" :lg="8" style="margin-bottom: 20px;">
         <Card shadow>
-          <chart-pie style="height: 300px;" :value="pieData" text="用户访问来源"></chart-pie>
+          <chart-pie style="height: 300px;" ref="platformPieViewRef" :value="platformData" text="交易平台分布"></chart-pie>
         </Card>
       </i-col>
-      <i-col :md="24" :lg="16" style="margin-bottom: 20px;">
+      <i-col :md="24" :lg="8" style="margin-bottom: 20px;">
         <Card shadow>
-          <chart-bar style="height: 300px;" :value="barData" text="每周用户活跃量"/>
+          <chart-pie style="height: 300px;" ref="channelPieViewRef" :value="channelData" text="Top3渠道"></chart-pie>
+        </Card>
+      </i-col>
+      <i-col :md="24" :lg="8" style="margin-bottom: 20px;">
+        <Card shadow>
+          <chart-pie style="height: 300px;" ref="subAppPieViewRef" :value="subAppData" text="Top5子商户交易"></chart-pie>
         </Card>
       </i-col>
     </Row>
     <Row>
       <Card shadow>
-        <example style="height: 310px;"/>
+        <example
+          ref="tradeHistoryLineViewRef"
+          :x-array="xDateHistory"
+          :y-success-amount-array="ySuccessAmountData"
+          :y-success-count-array="ySuccessCountData"
+          style="height: 350px;"/>
       </Card>
     </Row>
   </div>
 </template>
 
 <script>
-import InforCard from '_c/info-card'
-import CountTo from '_c/count-to'
-import { ChartPie, ChartBar } from '_c/charts'
-import Example from './example.vue'
-export default {
-  name: 'home',
-  components: {
-    InforCard,
-    CountTo,
-    ChartPie,
-    ChartBar,
-    Example
-  },
-  data () {
-    return {
-      inforCardData: [
-        { title: '新增用户', icon: 'md-person-add', count: 803, color: '#2d8cf0' },
-        { title: '累计点击', icon: 'md-locate', count: 232, color: '#19be6b' },
-        { title: '新增问答', icon: 'md-help-circle', count: 142, color: '#ff9900' },
-        { title: '分享统计', icon: 'md-share', count: 657, color: '#ed3f14' },
-        { title: '新增互动', icon: 'md-chatbubbles', count: 12, color: '#E46CBB' },
-        { title: '新增页面', icon: 'md-map', count: 14, color: '#9A66E4' }
-      ],
-      pieData: [
-        {value: 335, name: '直接访问'},
-        {value: 310, name: '邮件营销'},
-        {value: 234, name: '联盟广告'},
-        {value: 135, name: '视频广告'},
-        {value: 1548, name: '搜索引擎'}
-      ],
-      barData: {
-        Mon: 13253,
-        Tue: 34235,
-        Wed: 26321,
-        Thu: 12340,
-        Fri: 24643,
-        Sat: 1322,
-        Sun: 1324
+  import {
+    getTodayTradeStatRequest,
+    getTradeHistoryStatRequest,
+    getChannelTradeStatRequest,
+    getSubAppTradeStatRequest
+  } from '@/api/pay-api'
+  import {
+    transformChannel
+  } from '@/libs/StatusTransform'
+  import InforCard from '_c/info-card'
+  import CountTo from '_c/count-to'
+  import { ChartPie, ChartBar } from '_c/charts'
+  import Example from './example.vue'
+  import { mapGetters } from 'vuex'
+
+  export default {
+    name: 'home',
+    components: {
+      InforCard,
+      CountTo,
+      ChartPie,
+      ChartBar,
+      Example
+    },
+    data () {
+      return {
+        todayTradeData: [
+          { title: '成功交易金额', icon: 'md-person-add', count: 803, color: '#19be6b', key: 'successAmount' },
+          { title: '成功交易笔数', icon: 'md-locate', count: 232, color: '#19be6b', key: 'successCount' },
+          { title: '交易中金额', icon: 'md-help-circle', count: 142, color: '#ff9900', key: 'processAmount' },
+          { title: '交易中笔数', icon: 'md-help-circle', count: 657, color: '#ff9900', key: 'processCount' }
+        ],
+        platformData: [
+          { value: 0, name: '支付宝', key: 'ALIPAY' },
+          { value: 0, name: '微信', key: 'WXPAY' },
+          { value: 0, name: '银联', key: 'UNIONPAY' }
+        ],
+        channelData: [
+          { value: 0, name: '支付宝', key: 'ALIPAY' },
+          { value: 0, name: '微信', key: 'WXPAY' },
+          { value: 0, name: '银联', key: 'UNIONPAY' }
+        ],
+        subAppData: [
+          { value: 0, name: '暂无', platformType: '无' }
+        ],
+        // x轴的日期排列
+        xDateHistory: [],
+        // y轴的历史交易记录
+        ySuccessCountData: [],
+        ySuccessAmountData: []
       }
+    },
+    methods: {
+      getTodayTradeData () {
+        // 获取今日交易数据统计
+        getTodayTradeStatRequest(this.selectedAppId).then(res => {
+          let data = res.data
+          this.todayTradeData.forEach(item => {
+            if (item.key.indexOf('Amount')>0){
+              item.count = parseInt(data[item.key]/100)
+            } else{
+              item.count = data[item.key]
+            }
+          })
+        })
+      },
+      getChannelTradeStatData () {
+        getChannelTradeStatRequest(this.selectedAppId).then(res => {
+          let dataArray = res.data
+          this.platformData.forEach(item => {
+            for (let i = 0; i < dataArray.length; i++) {
+              if (item.key == dataArray[i].platformType) {
+                item.value += parseInt(dataArray[i].successAmount / 100)
+              }
+            }
+          })
+          let topChannelData = dataArray.slice(0, 3).filter(item => item.succeAmount != 0)
+          topChannelData.forEach(item => {
+            item.name = transformChannel(item.channelType)
+            item.value = parseInt(item.successAmount / 100)
+          })
+          this.channelData = topChannelData
+          this.$refs.platformPieViewRef.refreshView()
+          this.$refs.channelPieViewRef.refreshView()
+        })
+      },
+      getSubAppTradeStatData () {
+        getSubAppTradeStatRequest(this.selectedAppId).then(res => {
+          let dataArray = res.data
+          if (dataArray.length > 3) {
+            dataArray = dataArray.slice(0, 3)
+          }
+          dataArray.forEach(item => {
+            item.name = item.appId
+            item.value = parseInt(item.successAmount / 100)
+          })
+          this.subAppData = dataArray
+          this.$refs.subAppPieViewRef.refreshView()
+        })
+      },
+      getTradeHistoryStatData () {
+        getTradeHistoryStatRequest(this.selectedAppId).then(res => {
+          let dataArray = res.data
+          let xArray = []
+          let yAmount = []
+          let yCount = []
+          if (dataArray.length > 30) {
+            dataArray.slice(0, 30)
+          }
+          dataArray.forEach(item => {
+            xArray.push(item.statisticsDay)
+            yAmount.push(parseInt(item.successAmount/100))
+            yCount.push(parseInt(item.successCount))
+          })
+          this.xDateHistory = xArray.reverse()
+          this.ySuccessAmountData = yAmount.reverse()
+          this.ySuccessCountData = yCount.reverse()
+          this.$refs.tradeHistoryLineViewRef.refreshView()
+        })
+      }
+    },
+    computed: {
+      ...mapGetters({
+        selectedAppId: 'getSelectedAppId'
+      })
+    },
+    mounted () {
+      this.getTodayTradeData()
+      this.getChannelTradeStatData()
+      this.getSubAppTradeStatData()
+      this.getTradeHistoryStatData()
     }
-  },
-  mounted () {
-    //
   }
-}
 </script>
 
 <style lang="less">
-.count-style{
-  font-size: 50px;
-}
+  .count-style {
+    font-size: 50px;
+  }
 </style>

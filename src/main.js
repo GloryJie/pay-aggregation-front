@@ -38,7 +38,6 @@ Vue.prototype.$config = config
 importDirective(Vue)
 
 
-
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
